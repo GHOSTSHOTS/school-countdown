@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شمارش معکوس تا بازگشایی مدارس</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* 🚫 غیرفعال کردن انتخاب متن در کل صفحه */
+        * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #3e2723, #5d4037, #2e1a0f, #1a0f08);
+            background-size: 400% 400%;
+            animation: bgMove 15s ease infinite;
+            font-family: 'Tahoma', 'Segoe UI', sans-serif;
+            color: #fff;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+            padding: 20px;
+            cursor: default;
+        }
+
+        @keyframes bgMove {
+            0%, 100% { background-position: 0% 50%; }
+            50%      { background-position: 100% 50%; }
+        }
+
+        .leaf {
+            position: absolute;
+            top: -60px;
+            font-size: 1.8rem;
+            animation: fall linear infinite;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            50% { transform: translateY(50vh) translateX(40px) rotate(180deg); }
+            100% {
+                transform: translateY(110vh) translateX(-40px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 180, 100, 0.2);
+            border-radius: 28px;
+            padding: 50px 45px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 80px rgba(255, 140, 60, 0.1) inset;
+            animation: fadeIn 1s ease-out;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .school-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            display: block;
+            animation: swing 3s ease-in-out infinite;
+        }
+
+        @keyframes swing {
+            0%, 100% { transform: rotate(-6deg); }
+            50%      { transform: rotate(6deg); }
+        }
+
+        .poem {
+            font-size: 1.3rem;
+            color: #ffb877;
+            font-style: italic;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 15px rgba(255, 160, 60, 0.4);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed rgba(255, 180, 100, 0.3);
+        }
+
+        h1 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #ffd7a0;
+            letter-spacing: 1px;
+            line-height: 1.8;
+            text-shadow: 0 0 25px rgba(255, 160, 60, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #c9a884;
+            margin-bottom: 35px;
+            letter-spacing: 0.5px;
+        }
+
+        #countdown {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+            direction: ltr;
+        }
+
+        .time-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 95px;
+        }
+
+        .number {
+            font-size: 4rem;
+            font-weight: 700;
+            line-height: 1;
+            background: linear-gradient(180deg, #fff3e0, #ff9f43);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 160, 60, 0.5);
+            font-variant-numeric: tabular-nums;
+            transition: transform 0.2s ease;
+        }
+
+        .number.tick { transform: scale(1.08); }
+
+        .label {
+            font-size: 0.85rem;
+            margin-top: 10px;
+            color: #d9b48f;
+            letter-spacing: 1px;
+        }
+
+        .separator {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #ff9f43;
+            padding-bottom: 25px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50%      { opacity: 0.3; }
+        }
+
+        .finished {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.8;
+            background: linear-gradient(90deg, #ff9f43, #ffd93d);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .signature {
+            margin-top: 35px;
+            font-size: 0.95rem;
+            color: #a8836a;
+            letter-spacing: 1px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 20px;
+        }
+
+        .signature span {
+            color: #ffb877;
+            font-weight: 700;
+        }
+
+        /* ⚠️ هشدار کپی */
+        .copy-warning {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            background: linear-gradient(135deg, #ff4757, #ff6348);
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 700;
+            box-shadow: 0 10px 40px rgba(255, 71, 87, 0.5);
+            z-index: 9999;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            pointer-events: none;
+        }
+
+        .copy-warning.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 35px 20px; }
+            .number { font-size: 2.5rem; }
+            .time-box { min-width: 60px; }
+            .separator { font-size: 2rem; }
+            h1 { font-size: 1.2rem; }
+            .poem { font-size: 1.05rem; }
+            #countdown { gap: 8px; }
+            .school-icon { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ⚠️ پیام هشدار کپی -->
+    <div class="copy-warning" id="copyWarning">🚫 کپی کردن ممنوع است! این کار GHOSTSHOTS است.</div>
+
+    <div class="leaf" style="left:5%;  animation-duration:9s;  animation-delay:0s;">🍂</div>
+    <div class="leaf" style="left:18%; animation-duration:12s; animation-delay:2s;">🍁</div>
+    <div class="leaf" style="left:32%; animation-duration:10s; animation-delay:4s;">🍂</div>
+    <div class="leaf" style="left:48%; animation-duration:13s; animation-delay:1s;">🍁</div>
+    <div class="leaf" style="left:62%; animation-duration:9s;  animation-delay:3s;">🍂</div>
+    <div class="leaf" style="left:76%; animation-duration:11s; animation-delay:5s;">🍁</div>
+    <div class="leaf" style="left:88%; animation-duration:14s; animation-delay:2s;">🍂</div>
+
+    <div class="container">
+        <span class="school-icon">🏫</span>
+
+        <div class="poem">🍁 باز آمد بوی گند مدرسه 🍁</div>
+
+        <h1>⏳ زمان باقی‌مانده تا بازگشایی مدارس</h1>
+        <p class="subtitle">📅 چهارشنبه ۱ مهر — ساعت ۷ صبح</p>
+
+        <div id="countdown">
+            <div class="time-box">
+                <span class="number" id="days">۰</span>
+                <span class="label">روز</span>
+            </div>
+            <span class="separator">:</span>
+            <div class="time-box">
+                <span class="number" id="hours">۰</span>
+                <span class="label">ساعت</span>
+            </div>
+            <span class="separator">:</span>
+            <div class="time-box">
+                <span class="number" id="minutes">۰</span>
+                <span class="label">دقیقه</span>
+            </div>
+            <span class="separator">:</span>
+            <div class="time-box">
+                <span class="number" id="seconds">۰</span>
+                <span class="label">ثانیه</span>
+            </div>
+        </div>
+
+        <div class="signature">
+            سازنده: <span>GHOSTSHOTS</span>
+        </div>
+    </div>
+
+    <script>
+        // ======================================================
+        //  تبدیل تاریخ شمسی به میلادی
+        // ======================================================
+        function jalaliToGregorian(jy, jm, jd) {
+            jy += 1595;
+            let days = -355668 + (365 * jy) + (~~(jy / 33) * 8) + ~~(((jy % 33) + 3) / 4) + jd;
+            days += (jm < 7) ? (jm - 1) * 31 : ((jm - 7) * 30) + 186;
+            let gy = 400 * ~~(days / 146097);
+            days %= 146097;
+            if (days > 36524) {
+                gy += 100 * ~~(--days / 36524);
+                days %= 36524;
+                if (days >= 365) days++;
+            }
+            gy += 4 * ~~(days / 1461);
+            days %= 1461;
+            if (days > 365) {
+                gy += ~~((days - 1) / 365);
+                days = (days - 1) % 365;
+            }
+            let gd = days + 1;
+            const sal_a = [0, 31, (gy % 4 === 0 && gy % 100 !== 0) || (gy % 400 === 0) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            let gm;
+            for (gm = 1; gm <= 12; gm++) {
+                if (gd <= sal_a[gm]) break;
+                gd -= sal_a[gm];
+            }
+            return { gy, gm, gd };
+        }
+
+        // ======================================================
+        //  🔴 تاریخ هدف: چهارشنبه ۱ مهر ۱۴۰۵ ساعت ۷:۰۰ صبح
+        // ======================================================
+        const TARGET_JY = 1405;
+        const TARGET_JM = 7;
+        const TARGET_JD = 1;
+        const TARGET_HOUR = 7;
+        const TARGET_MINUTE = 0;
+
+        const g = jalaliToGregorian(TARGET_JY, TARGET_JM, TARGET_JD);
+        const targetDate = new Date(g.gy, g.gm - 1, g.gd, TARGET_HOUR, TARGET_MINUTE, 0);
+
+        function toPersianDigits(num) {
+            const p = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+            return String(num).replace(/\d/g, d => p[d]);
+        }
+
+        function pad(num) { return num < 10 ? '0' + num : String(num); }
+
+        const daysEl    = document.getElementById('days');
+        const hoursEl   = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+        const countdownEl = document.getElementById('countdown');
+
+        let lastSecond = -1;
+
+        function updateCountdown() {
+            const now = new Date();
+            const diff = targetDate - now;
+
+            if (diff <= 0) {
+                countdownEl.innerHTML = '<div class="finished">🏫 بازگشایی مدارس فرا رسید! 🏫<br>🍁 باز آمد بوی گند مدرسه 🍁</div>';
+                clearInterval(interval);
+                return;
+            }
+
+            const totalSeconds = Math.floor(diff / 1000);
+            const days    = Math.floor(totalSeconds / 86400);
+            const hours   = Math.floor((totalSeconds % 86400) / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            daysEl.textContent    = toPersianDigits(days);
+            hoursEl.textContent   = toPersianDigits(pad(hours));
+            minutesEl.textContent = toPersianDigits(pad(minutes));
+            secondsEl.textContent = toPersianDigits(pad(seconds));
+
+            if (seconds !== lastSecond) {
+                lastSecond = seconds;
+                secondsEl.classList.add('tick');
+                setTimeout(() => secondsEl.classList.remove('tick'), 200);
+            }
+        }
+
+        updateCountdown();
+        const interval = setInterval(updateCountdown, 1000);
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) updateCountdown();
+        });
+
+        // ======================================================
+        //  🛡️  محافظت‌های امنیتی
+        // ======================================================
+
+        const warning = document.getElementById('copyWarning');
+        let warningTimer = null;
+
+        function showWarning(msg) {
+            warning.textContent = msg || '🚫 کپی کردن ممنوع است! این کار GHOSTSHOTS است.';
+            warning.classList.add('show');
+            clearTimeout(warningTimer);
+            warningTimer = setTimeout(() => {
+                warning.classList.remove('show');
+            }, 2000);
+        }
+
+        // 1️⃣ غیرفعال کردن راست‌کلیک
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            showWarning('🚫 راست‌کلیک ممنوع!');
+            return false;
+        });
+
+        // 2️⃣ غیرفعال کردن کلیدهای میانبر کپی و ابزار توسعه‌دهنده
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+C, Ctrl+X, Ctrl+A, Ctrl+S, Ctrl+U, Ctrl+P
+            if (e.ctrlKey && ['c','x','a','s','u','p'].includes(e.key.toLowerCase())) {
+                e.preventDefault();
+                showWarning('🚫 کپی کردن ممنوع!');
+                return false;
+            }
+            // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (ابزار توسعه‌دهنده)
+            if (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase())) {
+                e.preventDefault();
+                showWarning('🚫 ابزار توسعه‌دهنده غیرفعال است!');
+                return false;
+            }
+            // F12
+            if (e.key === 'F12') {
+                e.preventDefault();
+                showWarning('🚫 F12 غیرفعال است!');
+                return false;
+            }
+            // Ctrl+U (مشاهده سورس)
+            if (e.ctrlKey && e.key.toLowerCase() === 'u') {
+                e.preventDefault();
+                showWarning('🚫 مشاهده سورس ممنوع!');
+                return false;
+            }
+        });
+
+        // 3️⃣ غیرفعال کردن رویداد کپی
+        document.addEventListener('copy', (e) => {
+            e.preventDefault();
+            showWarning('🚫 کپی کردن ممنوع!');
+            return false;
+        });
+
+        // 4️⃣ غیرفعال کردن رویداد برش (Cut)
+        document.addEventListener('cut', (e) => {
+            e.preventDefault();
+            showWarning('🚫 برش ممنوع!');
+            return false;
+        });
+
+        // 5️⃣ غیرفعال کردن درگ کردن
+        document.addEventListener('dragstart', (e) => {
+            e.preventDefault();
+            return false;
+        });
+
+        // 6️⃣ غیرفعال کردن لمس طولانی روی موبایل
+        document.addEventListener('touchstart', (e) => {
+            // فقط اگر لمس طولانی باشد (بیش از ۵۰۰ میلی‌ثانیه)
+            const timer = setTimeout(() => {
+                e.preventDefault();
+                showWarning('🚫 کپی کردن ممنوع!');
+            }, 500);
+            document.addEventListener('touchend', () => clearTimeout(timer), { once: true });
+        }, { passive: false });
+
+        // 7️⃣ پاک کردن کلیپ‌بورد در صورت تلاش برای کپی
+        document.addEventListener('copy', () => {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText('🚫 کپی کردن ممنوع است! سازنده: GHOSTSHOTS');
+            }
+        });
+
+        // 8️⃣ غیرفعال کردن انتخاب متن با دوبار کلیک
+        document.addEventListener('selectstart', (e) => {
+            e.preventDefault();
+            return false;
+        });
+
+        // 9️⃣ هشدار در کنسول برای کپی‌کننده‌ها
+        console.log('%c🚫 STOP!', 'color: red; font-size: 40px; font-weight: bold; text-shadow: 2px 2px 0 black;');
+        console.log('%cاین کد متعلق به GHOSTSHOTS است. کپی کردن ممنوع!', 'color: orange; font-size: 18px; font-weight: bold;');
+
+        // 🔟 غیرفعال کردن Print Screen (تا حد امکان)
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'PrintScreen') {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText('🚫 اسکرین‌شات ممنوع! سازنده: GHOSTSHOTS');
+                }
+                showWarning('🚫 اسکرین‌شات ممنوع!');
+            }
+        });
+    </script>
+</body>
+</html>
